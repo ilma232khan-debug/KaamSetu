@@ -1,0 +1,33 @@
+name: Build KaamSetu APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download project
+        uses: actions/checkout@v4
+
+      - name: Extract project ZIP
+        run: |
+          unzip -o *.zip -d project
+
+      - name: Find Android project
+        run: |
+          find project -name gradlew -type f -exec dirname {} \; > project_path.txt
+          chmod +x "$(cat project_path.txt)/gradlew"
+
+      - name: Build APK
+        run: |
+        cd "$(cat project_path.txt)"
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+  
+        with:
+          name: KaamSetu-APK
+          path: "**/build/outputs/apk/debug/*.apk"
